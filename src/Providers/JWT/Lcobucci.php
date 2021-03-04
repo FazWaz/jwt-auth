@@ -107,7 +107,7 @@ class Lcobucci extends Provider implements JWT
         try {
             $signingKey = $this->getSigningKey();
             $signingKey = is_string($signingKey) ? Key\InMemory::plainText($signingKey) : $signingKey;
-            if ($payload[RegisteredClaims::AUDIENCE]) {
+            if (!empty($payload[RegisteredClaims::AUDIENCE])) {
                 $this->builder->permittedFor($payload[RegisteredClaims::AUDIENCE]);
             }
 
