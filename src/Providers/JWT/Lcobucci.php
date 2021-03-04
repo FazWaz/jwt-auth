@@ -23,13 +23,18 @@ use Lcobucci\JWT\Signer\Hmac\Sha256 as HS256;
 use Lcobucci\JWT\Signer\Hmac\Sha384 as HS384;
 use Lcobucci\JWT\Signer\Hmac\Sha512 as HS512;
 use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Signer\Rsa;
 use Lcobucci\JWT\Signer\Rsa\Sha256 as RS256;
 use Lcobucci\JWT\Signer\Rsa\Sha384 as RS384;
 use Lcobucci\JWT\Signer\Rsa\Sha512 as RS512;
 use Lcobucci\JWT\Token\RegisteredClaims;
 use ReflectionClass;
+use Tymon\JWTAuth\Claims\Expiration;
+use Tymon\JWTAuth\Claims\IssuedAt;
+use Tymon\JWTAuth\Claims\Issuer;
+use Tymon\JWTAuth\Claims\JwtId;
+use Tymon\JWTAuth\Claims\NotBefore;
+use Tymon\JWTAuth\Claims\Subject;
 use Tymon\JWTAuth\Contracts\Providers\JWT;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -49,6 +54,11 @@ class Lcobucci extends Provider implements JWT
      * @var \Lcobucci\JWT\Parser
      */
     protected $parser;
+
+    /**
+     * @var \Lcobucci\JWT\Signer
+     */
+    protected $signer;
 
     /**
      * Create the Lcobucci provider.
@@ -110,14 +120,13 @@ class Lcobucci extends Provider implements JWT
             if (!empty($payload[RegisteredClaims::AUDIENCE])) {
                 $this->builder->permittedFor($payload[RegisteredClaims::AUDIENCE]);
             }
-
             $this->builder
-                ->expiresAt($payload[RegisteredClaims::EXPIRATION_TIME])
-                ->identifiedBy($payload[RegisteredClaims::ID])
-                ->issuedAt($payload[RegisteredClaims::ISSUED_AT])
-                ->issuedBy($payload[RegisteredClaims::ISSUER])
-                ->canOnlyBeUsedAfter($payload[RegisteredClaims::NOT_BEFORE])
-                ->relatedTo($payload[RegisteredClaims::SUBJECT]);
+                ->expiresAt((new Expiration($payload[RegisteredClaims::EXPIRATION_TIME]))->getValue())
+                ->identifiedBy((new JwtId($payload[RegisteredClaims::ID]))->getValue())
+                ->issuedAt((new IssuedAt($payload[RegisteredClaims::ISSUED_AT]))->getValue())
+                ->issuedBy((new Issuer($payload[RegisteredClaims::ISSUER]))->getValue())
+                ->canOnlyBeUsedAfter((new NotBefore($payload[RegisteredClaims::NOT_BEFORE]))->getValue())
+                ->relatedTo((new Subject($payload[RegisteredClaims::SUBJECT]))->getValue());
 
             foreach ($payload as $key => $value) {
                 $this->builder->withHeader($key, $value);

@@ -57,13 +57,12 @@ class LcobucciTest extends AbstractTestCase
     public function it_should_return_the_token_when_passing_a_valid_payload_to_encode()
     {
         $payload = ['sub' => 1, 'exp' => $this->testNowTimestamp + 3600, 'iat' => $this->testNowTimestamp, 'iss' => '/foo'];
-        $signer = Mockery::any();
         $this->builder->shouldReceive('unsign')->once()->andReturnSelf();
         $this->builder->shouldReceive('set')->times(count($payload));
 
         $token = $this->getProvider('secret', 'HS256')->encode($payload);
 
-        $this->assertSame('foo.bar.baz', $token);
+        self::assertSame('foo.bar.baz', $token);
     }
 
     /** @test */
@@ -91,7 +90,7 @@ class LcobucciTest extends AbstractTestCase
             ->andReturn(true);
         $this->token->shouldReceive('getClaims')->once()->andReturn($payload);
 
-        $this->assertSame($payload, $this->getProvider('secret', 'HS256')->decode('foo.bar.baz'));
+        self::assertSame($payload, $this->getProvider('secret', 'HS256')->decode('foo.bar.baz'));
     }
 
     /** @test */
@@ -141,7 +140,7 @@ class LcobucciTest extends AbstractTestCase
 
         $token = $provider->encode($payload);
 
-        $this->assertSame('foo.bar.baz', $token);
+        self::assertSame('foo.bar.baz', $token);
     }
 
     /** @test */
@@ -165,7 +164,7 @@ class LcobucciTest extends AbstractTestCase
             $keys = ['private' => $this->getDummyPrivateKey(), 'public' => $this->getDummyPublicKey()]
         );
 
-        $this->assertSame($keys['public'], $provider->getPublicKey());
+        self::assertSame($keys['public'], $provider->getPublicKey());
     }
 
     /** @test */
@@ -177,7 +176,7 @@ class LcobucciTest extends AbstractTestCase
             $keys = ['private' => $this->getDummyPrivateKey(), 'public' => $this->getDummyPublicKey()]
         );
 
-        $this->assertSame($keys, $provider->getKeys());
+        self::assertSame($keys, $provider->getKeys());
     }
 
     public function getProvider($secret, $algo, array $keys = [])

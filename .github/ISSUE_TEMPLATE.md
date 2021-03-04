@@ -9,7 +9,7 @@ Describe your issue here.
 | Framework         | Laravel / Lumen
 | Framework version | 5.x.y
 | Package version   | 1.x.y
-| PHP version       | 8.x.y
+| PHP version       | 5.x.y / 7.x.y / 8.x.y
 
 ### Steps to reproduce
 Tell us how to reproduce this issue.
